@@ -1,0 +1,54 @@
+# Assumptions
+
+With no documentation beyond the method signatures, some assumptions were made:
+
+- The system doesn't store the contents of files, just the metadata about them (name, size, path, etc.)
+- The system only supports a single instance of a filesystem. The db schema could handle multiple discreet trees, but would require persisting or specifying a tree identifier for each session.
+- The characters '/', '\' and ':' are not allowed in file or directory names.
+- The path of folders is stored in the database. As the FolderInterface, unlike the FileInterface doesn't contain a getParentFolder method.
+
+# Requirements
+
+A MySQL database is required for data storage. A basic Vagrantfile and provisioning shell script is provided for ease of testing.
+
+# Setup
+
+The MySQL connection details are set in the fsm.ini file. These are initially set to match the Vagrantfile config but can be changed to point to any MySQL instance.
+The vagrant provisioning script will automatically create the database and table. If using a different server, the table schema is located in schema.sql.
+
+Although no components are installed, Composer is used for autoloading. Create the relevant files with:
+
+	composer dump-autoload
+
+# Usage
+
+Run the application with:
+
+	php manager.php
+
+This will present the user with the `FSM />` prompt at which commands can be entered. The prompt will update with the path of the current working directory.
+
+## Available Commands
+
+- `help` - Display this list of commands
+- `ls` - List files in current folder.
+- `cd [name]` - Change directory to the named subdirectory of the current directory, or the parent directory if '..' is the argument. This command does not support compound paths such as `cd one/two`.
+- `quit` - Quit
+- `mkdir [name]` - Create a folder.
+- `touch [name] [size]` - Create or update a file. (Size is optional.)
+- `rm [name]` - delete file or folder (recursively).
+- `du` - get the size of all files in the current directory and subdirectories.
+- `rename [source] [dest]` - change the name of the file or folder `source` to `dest`.
+
+
+# Tests
+
+PHPUnit tests have been created (in the tests folder) for the bulk of the Spol\FSM namespace. For the sake of time they have been omitted for the Spol\FSM\Commands namespace.
+
+# Comments
+
+Although the underlying classes do support spaces, due to the simple nature of the command parser, spaces are not supported in command arguments, neither escaped like `A\ B` nor quoted like `"A B"`.
+
+Many filesystem abstractions, including PHP's tend to treat directories as a special case of files. The FileInterface and FolderInterface interfaces share a large number of methods so the same approach could have been taken here – my implementation does utilise a common parent class for logic shared by both concrete classes.
+
+Using a sqlite database rather than MySQL would avoid the necessity of setting up a MySQL server.

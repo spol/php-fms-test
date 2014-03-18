@@ -1,0 +1,9 @@
+{
+	"name": "File System Manager",
+	"autoload": {
+		"psr-4": {
+			"Spol\\FSM\\": "Spol/",
+			"": "JDI/"
+		}
+	}
+}
